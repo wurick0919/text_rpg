@@ -1,0 +1,19 @@
+# CLion build directories
+cmake-build-*/
+.idea/
+
+# Compiled binaries and objects
+*.o
+*.out
+*.a
+*.so
+*.exe
+
+# CMake generated files
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+
+# macOS metadata files
+.DS_Store
