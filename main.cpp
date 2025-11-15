@@ -34,7 +34,7 @@ public:
 class Player : public Creature {
 public:
     int level{};
-    Player (std::string name, char symbol = '@', int health = 10, int DPA = 3, int defense = 1, int gold = 0, int level = 1) : Creature{name, symbol, health, DPA, defense, gold}, level{level} {}
+    Player (std::string name, char symbol = '@', int health = 10, int DPA = 3, int defense = 1, int gold = 10, int level = 1) : Creature{name, symbol, health, DPA, defense, gold}, level{level} {}
 
     void levelUp() {
         level ++;
@@ -105,7 +105,7 @@ private:
         {       // poison potion
             Creature { "poison", 's', -1, 0, 0, 0 },
             Creature { "poison", 'm', -3, 0, 0, 0 },
-            Creature { "poison", 'l', -10, 0, -1, 0 }
+            Creature { "poison", 'l', -10, 0, 0, 0 }
         },
 
     };
@@ -183,8 +183,9 @@ void attackPlayer(Monster& monster, Player& player) {
         return;
     }
     else {
-        player.health -= monster.DPA;
-        std::cout << "The " << monster.getName() << " attacked you for " << monster.getDPA() << " damages." << std::endl;
+        int damage = (monster.DPA > player.defense) ? monster.DPA - player.defense : 0;
+        player.health -= damage;
+        std::cout << "The " << monster.getName() << " attacked you for " << damage << " damages." << std::endl;
         if (player.isDead()) {
             std::cout << "You died." << std::endl;
         }
@@ -195,11 +196,11 @@ void attackPlayer(Monster& monster, Player& player) {
 void attackMonster(Player& player, Monster& monster) {
     if (player.isDead()) {
         return;
-
     }
     else {
-        monster.health -= player.DPA;
-        std::cout << "You attacked the " << monster.getName() <<  " for " << player.getDPA() << " damages." << std::endl;
+        int damage = (player.DPA > monster.defense) ? player.DPA - monster.defense : 0;
+        monster.health -= damage;
+        std::cout << "You attacked the " << monster.getName() <<  " for " << damage << " damages." << std::endl;
         if (monster.isDead()) {
             std::cout << "You killed the " << monster.getName() << "!" << std::endl;
             player.levelUp();
@@ -218,9 +219,10 @@ void attackMonster(Player& player, Monster& monster) {
                     Potion potion {Potion::getRandomPotion()};
                     player.health += potion.health;
                     player.DPA += potion.DPA;
+                    player.defense += potion.defense;
                     std::cout << "You drank a " << potion.name << "(" << potion.symbol << ")" << "potion" << std::endl;
                     if (potion.name == "strength"){
-                        std::cout << "You've gained " << potion.DPA << " damages." << std::endl;
+                        std::cout << "You've gained " << potion.DPA << " damages and " << potion.defense << " defenses."<< std::endl;
                     }
                     else if (potion.name == "heal") {
                         std::cout << "You've gained " << potion.health << " health." << std::endl;
@@ -249,6 +251,7 @@ void fightMonster(Player& player) {
         std::cout <<"Your level:" << player.getLevel() << std::endl;
         std::cout << "Your health:" << player.health << std::endl;
         std::cout << "Your DPA:" << player.DPA << std::endl;
+        std::cout << "Your defense:" << player.defense << std::endl;
         std::cout << "(R)un or (F)ight:";
         std::cin >> fight_run;
         if (fight_run == 'R' or fight_run == 'r') {
@@ -267,17 +270,36 @@ void fightMonster(Player& player) {
             attackPlayer(monster, player);
             continue;
         }
+    }
+}
+
+void encounterMerchant(Player& player) {
+    std::cout << "You've encountered a merchant." << std::endl;
+    Equipment equipment{Equipment::getRandomEquipment()};
+    std::cout << "The merchant sells a " << equipment.name << "(" << equipment.symbol << ")." << std::endl;
+    std::cout << "You have " << player.gold << " gold, do you want to buy(y/n)?" << std::endl;
+    char buy_leave{};
+    std::cin >> buy_leave;
+    if (buy_leave == 'y' or buy_leave == 'Y') {
+        if (player.gold >= equipment.gold) {
+            std::cout << "You've bought " << equipment.name << "(" << equipment.symbol << ")." << std::endl;
+            player.gold -= equipment.gold;
+            player.health += equipment.health;
+            player.DPA += equipment.DPA;
+            player.defense += equipment.defense;
+        }
+        else {
+            std::cout << "You don't have enough gold" << std::endl;
+        }
 
     }
-
+    else {
+        std::cout << "You've left the merchant." << std::endl;
+    }
 }
 
 int main()
 {
-    // Creature o{ "orc", 'o', 4, 2, 10 };
-    // o.addGold(5);
-    // o.reduceHealth(1);
-    // std::cout << "The " << o.getName() << " has " << o.getHealth() << " health and is carrying " << o.getGold() << " gold.\n";
     std::string my_name;
     std::cout << "Please enter player name: ";
     std::cin >> my_name;
@@ -285,12 +307,12 @@ int main()
     Player player(my_name);
     while (!player.isDead() && !player.hasWon()) {
         fightMonster(player);
+        if (Random::get(1, 3) == 1){encounterMerchant(player);}
     }
     if (player.hasWon()) {
         std::cout << "You won." << std::endl;
     }
-    // Monster monster_a{ Monster::orc };
-    // std::cout << "An " << monster_a.getName() << " (" << monster_a.getSymbol() << ") was created.\n";
+
 
     return 0;
 }
