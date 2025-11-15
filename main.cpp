@@ -34,7 +34,8 @@ public:
 class Player : public Creature {
 public:
     int level{};
-    Player (std::string name, char symbol = '@', int health = 10, int DPA = 3, int defense = 1, int gold = 10, int level = 1) : Creature{name, symbol, health, DPA, defense, gold}, level{level} {}
+    int flee_rate{};
+    Player (std::string name, char symbol = '@', int health = 10, int DPA = 3, int defense = 1, int gold = 10, int level = 1, int flee_rate = 7) : Creature{name, symbol, health, DPA, defense, gold}, level{level}, flee_rate {flee_rate} {}
 
     void levelUp() {
         level ++;
@@ -122,7 +123,7 @@ class Equipment : public Creature {
     public:
 
     enum Type {
-        helmet,
+        // helmet,
         armor,
         sword,
         boots,
@@ -141,12 +142,12 @@ class Equipment : public Creature {
     private:
 
     static inline Creature equipmentData[max_types][max_quality] {
-        {       // helmet
-            Creature { "helmet", 'o', 2, 0, 0, 5 },
-            Creature { "helmet", 'n', 4, 0, 0, 10 },
-            Creature { "helmet", 'r', 6, 0, 0, 15 },
-            Creature { "helmet", 'e', 10, 0, 0, 20 }
-        },
+        // {       // helmet
+        //     Creature { "helmet", 'o', 2, 0, 0, 5 },
+        //     Creature { "helmet", 'n', 4, 0, 0, 10 },
+        //     Creature { "helmet", 'r', 6, 0, 0, 15 },
+        //     Creature { "helmet", 'e', 10, 0, 0, 20 }
+        // },
 
         {       // armor
             Creature { "armor", 'o', 0, 0, 3, 5 },
@@ -162,10 +163,10 @@ class Equipment : public Creature {
             Creature { "sword", 'e', 0, 10, 0, 15 }
         },
         {       // boots
-            Creature { "boots", 'o', 1, 0, 0, 3 },
-            Creature { "boots", 'n', 2, 0, 0, 5 },
-            Creature { "boots", 'r', 3, 0, 0, 7 },
-            Creature { "boots", 'e', 4, 0, 0, 10 }
+            Creature { "boots", 'o', 0, 0, 0, 3 },
+            Creature { "boots", 'n', 0, 0, 0, 5 },
+            Creature { "boots", 'r', 0, 0, 0, 7 },
+            Creature { "boots", 'e', 0, 0, 0, 10 }
         },
 
     };
@@ -255,7 +256,7 @@ void fightMonster(Player& player) {
         std::cout << "(R)un or (F)ight:";
         std::cin >> fight_run;
         if (fight_run == 'R' or fight_run == 'r') {
-            if (Random::get(1, 2) == 1) {
+            if (Random::get(player.flee_rate, 11) == 10) {
                 std::cout << "You successfully fled." << std::endl;
                 return;
             }
@@ -287,6 +288,22 @@ void encounterMerchant(Player& player) {
             player.health += equipment.health;
             player.DPA += equipment.DPA;
             player.defense += equipment.defense;
+            if (equipment.name == "boots") {
+                switch (equipment.symbol) {
+                    case 'o':
+                        player.flee_rate = 4;
+                        break;
+                    case 'n':
+                        player.flee_rate = 6;
+                        break;
+                    case 'r':
+                        player.flee_rate = 8;
+                        break;
+                    case 'e':
+                        player.flee_rate = 10;
+                        break;
+                }
+            }
         }
         else {
             std::cout << "You don't have enough gold" << std::endl;
@@ -306,8 +323,8 @@ int main()
     std::cout << "Welcome " << my_name <<"." << std::endl;
     Player player(my_name);
     while (!player.isDead() && !player.hasWon()) {
-        fightMonster(player);
         if (Random::get(1, 3) == 1){encounterMerchant(player);}
+        fightMonster(player);
     }
     if (player.hasWon()) {
         std::cout << "You won." << std::endl;
