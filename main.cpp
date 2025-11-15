@@ -123,7 +123,7 @@ public:
 };
 
 class Equipment : public Creature {
-public:
+    public:
 
     enum Type {
         helmet,
@@ -137,14 +137,14 @@ public:
         normal,
         rare,
         epic,
-        max_types,
+        max_quality,
     };
 
-    Equipment (Type type, Quantity quality) : Creature{ potionData[type][quality] }{};
+    Equipment (Type type, Quality quality) : Creature{ equipmentData[type][quality] }{};
 
-private:
+    private:
 
-    static inline Creature equipmentData[max_types][max_sizes] {
+    static inline Creature equipmentData[max_types][max_quality] {
         {       // helmet
             Creature { "helmet", 'o', 2, 0, 5 },
             Creature { "helmet", 'n', 4, 0, 10 },
@@ -152,24 +152,32 @@ private:
             Creature { "helmet", 'e', 10, 0, 20 }
         },
 
-        {       // strength potion
-            Creature { "strength", 's', 0, 1, 0 },
-            Creature { "strength", 'm', 0, 3, 0 },
-            Creature { "strength", 'l', 0, 5, 0 }
+        {       // armor
+            Creature { "armor", 'o', 3, 0, 5 },
+            Creature { "armor", 'n', 5, 0, 10 },
+            Creature { "armor", 'r', 7, 0, 15 },
+            Creature { "armor", 'e', 12, 0, 20 }
         },
 
-        {       // poison potion
-            Creature { "poison", 's', -1, 0, 0 },
-            Creature { "poison", 'm', -3, 0, 0 },
-            Creature { "poison", 'l', -10, 0, 0 }
+        {       // sword
+            Creature { "sword", 'o', 0, 3, 5 },
+            Creature { "sword", 'n', 0, 5, 7 },
+            Creature { "sword", 'r', 0, 7, 10 },
+            Creature { "sword", 'e', 0, 10, 15 }
+        },
+        {       // boots
+            Creature { "boots", 'o', 1, 0, 3 },
+            Creature { "boots", 'n', 2, 0, 5 },
+            Creature { "boots", 'r', 3, 0, 7 },
+            Creature { "boots", 'e', 4, 0, 10 }
         },
 
     };
-public:
-    static Potion getRandomPotion() {
+    public:
+    static Equipment getRandomEquipment() {
         int type_num{ Random::get(0, max_types - 1) };
-        int size_num{ Random::get(0, max_sizes - 1) };
-        return Potion{ static_cast<Type>(type_num), static_cast<Size>(size_num) };
+        int size_num{ Random::get(0, max_quality - 1) };
+        return Equipment{ static_cast<Type>(type_num), static_cast<Quality>(size_num) };
     }
 
 };
