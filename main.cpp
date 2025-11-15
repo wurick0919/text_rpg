@@ -8,14 +8,16 @@ public:
     char symbol{};
     int health{};
     int DPA{};
+    int defense{};
     int gold{};
 
-    Creature(std::string name, char symbol, int health, int DPA, int gold) : name{name}, symbol{symbol}, health{health}, DPA{DPA}, gold{gold} {}
+    Creature(std::string name, char symbol, int health, int DPA, int defense, int gold) : name{name}, symbol{symbol}, health{health}, DPA{DPA}, defense{defense}, gold{gold} {}
 
     std::string getName() {return name;}
     char getSymbol() {return symbol;}
     int getHealth() {return health;}
     int getDPA() {return DPA;}
+    int getDefense() {return defense;}
     int getGold() {return gold;}
 
     void reduceHealth(int n) {
@@ -32,10 +34,11 @@ public:
 class Player : public Creature {
 public:
     int level{};
-    Player (std::string name, char symbol = '@', int health = 10, int DPA = 1, int gold = 0, int level = 1) : Creature{name, symbol, health, DPA, gold}, level{level} {}
+    Player (std::string name, char symbol = '@', int health = 10, int DPA = 3, int defense = 1, int gold = 0, int level = 1) : Creature{name, symbol, health, DPA, defense, gold}, level{level} {}
 
     void levelUp() {
         level ++;
+        defense ++;
         DPA ++;
     }
 
@@ -54,9 +57,9 @@ public:
 private:
     static inline Creature monsterData[] {
     // Creature monsterData[] {
-        Creature { "dragon", 'D', 20, 4, 100 },
-        Creature { "orc", 'o', 4, 2, 25 },
-        Creature { "slime", 's', 1, 1, 10 }
+        Creature { "dragon", 'D', 20, 5, 10, 100 },
+        Creature { "orc", 'o', 4, 3, 3, 25 },
+        Creature { "slime", 's', 1, 2, 1, 10 }
     };
 public:
     Monster(Type type) : Creature{ monsterData[type] }{}
@@ -86,30 +89,23 @@ public:
     Potion (Type type, Size size) : Creature{ potionData[type][size] }{};
 
 private:
-    // static inline Creature potionData[][] {
-    //     Creature { "heal", 'H', 20, 0, 0 },
-    //     Creature { "strength", 'S', 0, 2, 0 },
-    //     Creature { "poison", 'P', -5, 0, 0 }
-    // };
-
-
     static inline Creature potionData[max_types][max_sizes] {
         {       // Health potion
-            Creature { "heal", 's', 2, 0, 0 },
-            Creature { "heal", 'm', 5, 0, 0 },
-            Creature { "heal", 'l', 10, 0, 0 }
+            Creature { "heal", 's', 3, 0, 0, 0 },
+            Creature { "heal", 'm', 7, 0, 0, 0 },
+            Creature { "heal", 'l', 10, 0, 0, 0 }
         },
 
         {       // strength potion
-            Creature { "strength", 's', 0, 1, 0 },
-            Creature { "strength", 'm', 0, 3, 0 },
-            Creature { "strength", 'l', 0, 5, 0 }
+            Creature { "strength", 's', 0, 1, 1, 0 },
+            Creature { "strength", 'm', 0, 3, 2, 0 },
+            Creature { "strength", 'l', 0, 5, 3, 0 }
         },
 
         {       // poison potion
-            Creature { "poison", 's', -1, 0, 0 },
-            Creature { "poison", 'm', -3, 0, 0 },
-            Creature { "poison", 'l', -10, 0, 0 }
+            Creature { "poison", 's', -1, 0, 0, 0 },
+            Creature { "poison", 'm', -3, 0, 0, 0 },
+            Creature { "poison", 'l', -10, 0, -1, 0 }
         },
 
     };
@@ -146,30 +142,30 @@ class Equipment : public Creature {
 
     static inline Creature equipmentData[max_types][max_quality] {
         {       // helmet
-            Creature { "helmet", 'o', 2, 0, 5 },
-            Creature { "helmet", 'n', 4, 0, 10 },
-            Creature { "helmet", 'r', 6, 0, 15 },
-            Creature { "helmet", 'e', 10, 0, 20 }
+            Creature { "helmet", 'o', 2, 0, 0, 5 },
+            Creature { "helmet", 'n', 4, 0, 0, 10 },
+            Creature { "helmet", 'r', 6, 0, 0, 15 },
+            Creature { "helmet", 'e', 10, 0, 0, 20 }
         },
 
         {       // armor
-            Creature { "armor", 'o', 3, 0, 5 },
-            Creature { "armor", 'n', 5, 0, 10 },
-            Creature { "armor", 'r', 7, 0, 15 },
-            Creature { "armor", 'e', 12, 0, 20 }
+            Creature { "armor", 'o', 0, 0, 3, 5 },
+            Creature { "armor", 'n', 0, 0, 5, 10 },
+            Creature { "armor", 'r', 0, 0, 7, 15 },
+            Creature { "armor", 'e', 0, 0, 10, 20 }
         },
 
         {       // sword
-            Creature { "sword", 'o', 0, 3, 5 },
-            Creature { "sword", 'n', 0, 5, 7 },
-            Creature { "sword", 'r', 0, 7, 10 },
-            Creature { "sword", 'e', 0, 10, 15 }
+            Creature { "sword", 'o', 0, 3, 0, 5 },
+            Creature { "sword", 'n', 0, 5, 0, 7 },
+            Creature { "sword", 'r', 0, 7, 0, 10 },
+            Creature { "sword", 'e', 0, 10, 0, 15 }
         },
         {       // boots
-            Creature { "boots", 'o', 1, 0, 3 },
-            Creature { "boots", 'n', 2, 0, 5 },
-            Creature { "boots", 'r', 3, 0, 7 },
-            Creature { "boots", 'e', 4, 0, 10 }
+            Creature { "boots", 'o', 1, 0, 0, 3 },
+            Creature { "boots", 'n', 2, 0, 0, 5 },
+            Creature { "boots", 'r', 3, 0, 0, 7 },
+            Creature { "boots", 'e', 4, 0, 0, 10 }
         },
 
     };
