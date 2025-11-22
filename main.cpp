@@ -36,7 +36,7 @@ class Player : public Creature {
 public:
     int level{};
     int flee_rate{};
-    Player (std::string name, char symbol = '@', int health = 10, int DPA = 3, int defense = 1, int gold = 10, int level = 1, int flee_rate = 7) : Creature{name, symbol, health, DPA, defense, gold}, level{level}, flee_rate {flee_rate} {}
+    Player (std::string name, char symbol = '@', int health = 10, int DPA = 3, int defense = 1, int gold = 10, int level = 1, int flee_rate = 3) : Creature{name, symbol, health, DPA, defense, gold}, level{level}, flee_rate {flee_rate} {}
 
     void levelUp() {
         level ++;
@@ -256,10 +256,11 @@ void fightMonster(Player& player) {
         std::cout << "Your health:" << player.health << std::endl;
         std::cout << "Your DPA:" << player.DPA << std::endl;
         std::cout << "Your defense:" << player.defense << std::endl;
+        std::cout << "Your flee rate:" << player.flee_rate << std::endl;
         std::cout << "(R)un or (F)ight:";
         std::cin >> fight_run;
         if (fight_run == 'R' or fight_run == 'r') {
-            if (std::rand() % 3 == 1) {
+            if (std::rand() % 11 <= player.flee_rate) {
                 std::cout << "You successfully fled." << std::endl;
                 return;
             }
