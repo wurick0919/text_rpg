@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
-#include "Random.h"
+#include <cstdlib> // For std::rand() and std::srand()
+#include <ctime>   // For std::time()
 
 class Creature {
 public:
@@ -66,7 +67,7 @@ public:
     Monster(Type type) : Creature{ monsterData[type] }{}
     static Monster getRandomMonster()
     {
-        int num{ Random::get(0, max_types - 1) };
+        int num{ std::rand() % max_types };
         return Monster{ static_cast<Type>(num) };
     }
 };
@@ -112,8 +113,10 @@ private:
     };
 public:
     static Potion getRandomPotion() {
-        int type_num{ Random::get(0, max_types - 1) };
-        int size_num{ Random::get(0, max_sizes - 1) };
+        // int type_num{ Random::get(0, max_types - 1) };
+        // int size_num{ Random::get(0, max_sizes - 1) };
+        int type_num{ std::rand() % max_types };
+        int size_num{ std::rand() % max_sizes };
         return Potion{ static_cast<Type>(type_num), static_cast<Size>(size_num) };
     }
 
@@ -172,8 +175,8 @@ class Equipment : public Creature {
     };
     public:
     static Equipment getRandomEquipment() {
-        int type_num{ Random::get(0, max_types - 1) };
-        int size_num{ Random::get(0, max_quality - 1) };
+        int type_num{ std::rand() % max_types };
+        int size_num{ std::rand() % max_quality };
         return Equipment{ static_cast<Type>(type_num), static_cast<Quality>(size_num) };
     }
 
@@ -207,7 +210,7 @@ void attackMonster(Player& player, Monster& monster) {
             player.levelUp();
             player.addGold(monster.gold);
             std::cout << "You leveled up!" << std::endl << "You found " << monster.getGold() << " gold!" << std::endl;
-            if (Random::get(1, 3) == 1) {
+            if (std::rand() % 3 == 1) {
                 std::cout << "You found a potion." << std::endl;
                 std::cout << "Your level:" << player.getLevel() << std::endl;
                 std::cout << "Your health:" << player.health << std::endl;
@@ -256,7 +259,7 @@ void fightMonster(Player& player) {
         std::cout << "(R)un or (F)ight:";
         std::cin >> fight_run;
         if (fight_run == 'R' or fight_run == 'r') {
-            if (Random::get(player.flee_rate, 11) == 10) {
+            if (std::rand() % 3 == 1) {
                 std::cout << "You successfully fled." << std::endl;
                 return;
             }
@@ -317,13 +320,15 @@ void encounterMerchant(Player& player) {
 
 int main()
 {
+    std::srand(static_cast<unsigned int>(std::time(0)));
+
     std::string my_name;
     std::cout << "Please enter player name: ";
     std::cin >> my_name;
     std::cout << "Welcome " << my_name <<"." << std::endl;
     Player player(my_name);
     while (!player.isDead() && !player.hasWon()) {
-        if (Random::get(1, 3) == 1){encounterMerchant(player);}
+        if (std::rand() % 3 == 1){encounterMerchant(player);}
         fightMonster(player);
     }
     if (player.hasWon()) {
